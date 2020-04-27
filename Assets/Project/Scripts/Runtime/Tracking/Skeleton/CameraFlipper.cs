@@ -1,42 +1,36 @@
 ﻿using UnityEngine;
 
-public class CameraFlipper : MonoBehaviour
+namespace Project.Scripts.Runtime.Tracking.Skeleton
 {
-    Camera cam;
-
-    [Tooltip("Flip by x axis")]
-    public bool flipByX;
-
-    void Start()
+    public class CameraFlipper : UnityEngine.MonoBehaviour
     {
-        cam = GetComponent<Camera>();
-    }
+        private Camera _camera;
 
-    // Flip fron camera to be aligned in directions with depth image on scene.
-    void OnPreCull()
-    {
-        if (flipByX)
+        [Tooltip("Flip by x axis")]
+        public bool flipByX;
+
+        void Start()
         {
-            cam.ResetWorldToCameraMatrix();
-            cam.ResetProjectionMatrix();
-            Vector3 scale = new Vector3(-1, 1, 1);
-            cam.projectionMatrix = cam.projectionMatrix * Matrix4x4.Scale(scale);
+            _camera = GetComponent<Camera>();
         }
-    }
-
-    void OnPreRender()
-    {
-        if (flipByX)
+        
+        void OnPreCull()
         {
-            GL.invertCulling = true;
+            if (!flipByX) return;
+            
+            _camera.ResetWorldToCameraMatrix();
+            _camera.ResetProjectionMatrix();
+            _camera.projectionMatrix *= Matrix4x4.Scale(new Vector3(-1, 1, 1));
         }
-    }
 
-    void OnPostRender()
-    {
-        if (flipByX)
+        void OnPreRender()
         {
-            GL.invertCulling = false;
+            if (flipByX) GL.invertCulling = true;
+        }
+
+        void OnPostRender()
+        {
+            if (flipByX) GL.invertCulling = false;
         }
     }
 }
