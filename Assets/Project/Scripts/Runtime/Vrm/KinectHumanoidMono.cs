@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Azure.Kinect.BodyTracking;
 using Project.Scripts.Runtime.Tracking.MonoBehaviour;
 using Project.Scripts.Runtime.Utils;
@@ -14,89 +15,205 @@ namespace Project.Scripts.Runtime.Vrm
         [SerializeField] private TrackerHandlerMono trackerHandlerMono;
         [SerializeField] private Animator animator;
         [SerializeField] private GameObject pelvis;
+        [SerializeField] private Boolean debugFlag;
 
-        // Start is called before the first frame update
+        [Space(16)] [SerializeField] private GameObject cube;
+        [SerializeField] private HumanBodyBones bone;
+        [SerializeField] private Vector3 boneRot;
+        [SerializeField] private JointId joinId;
+        [SerializeField] private Vector3 joinIdRot;
+
+        [Space(16)] [SerializeField] private Vector3 debugVec1;
+        [SerializeField] private Vector3 debugVec2;
+        [SerializeField] private Vector3 debugVec3;
+        [SerializeField] private Vector3 debugVec4;
+
         void Start()
         {
         }
 
-        // Update is called once per frame
         void Update()
         {
-            foreach (var bone in _boneMap)
+            // MoveBody();
+            MoveFinger();
+            if(debugFlag) debug();
+        }
+
+        void LateUpdate()
+        {
+        }
+
+        private void MoveBody()
+        {
+            var concat = new Dictionary<HumanBodyBones, JointId>().Concat(upperBodyBoneMap).Concat(lowerBodyBoneMap);
+            foreach (var bone in concat)
             {
                 try
                 {
-                    var rot = trackerHandlerMono.GetRelativeJointRotation(bone.Value);
-                    animator.GetBoneTransform(bone.Key).localRotation = new Quaternion(rot.x, rot.y, rot.z, rot.w);
+                    var nextRot = trackerHandlerMono.GetRelativeJointRotation(bone.Value);
+                    var prevRot = animator.GetBoneTransform(bone.Key).localRotation;
+                    animator.GetBoneTransform(bone.Key).localRotation =
+                        new Quaternion(nextRot.x, nextRot.y, nextRot.z, nextRot.w);
                 }
                 catch (Exception exception)
                 {
-                    Log.D(Tag, $"{bone}: {exception.Message}");
+                    // Log.D(Tag, $"{bone}: {exception.Message}");
                 }
             }
-            
+
             transform.localPosition = pelvis.transform.localPosition;
             transform.localRotation = pelvis.transform.localRotation;
         }
 
-        private readonly Dictionary<HumanBodyBones, JointId> _boneMap = new Dictionary<HumanBodyBones, JointId>()
+
+        private void MoveFinger()
         {
-            {HumanBodyBones.Hips, JointId.SpineNavel},
-            {HumanBodyBones.LeftUpperLeg, JointId.HipLeft},
-            {HumanBodyBones.RightUpperLeg, JointId.HipRight},
-            {HumanBodyBones.LeftLowerLeg, JointId.KneeLeft},
-            {HumanBodyBones.RightLowerLeg, JointId.KneeRight},
-            {HumanBodyBones.LeftFoot, JointId.FootLeft},
-            {HumanBodyBones.RightFoot, JointId.FootRight},
-            {HumanBodyBones.Spine, JointId.SpineNavel},
-            {HumanBodyBones.Chest, JointId.SpineChest},
-            //// {HumanBodyBones.UpperChest, JointId.SpineChest},
-            {HumanBodyBones.Neck, JointId.Neck},
-            {HumanBodyBones.Head, JointId.Head},
-            {HumanBodyBones.LeftShoulder, JointId.ClavicleLeft},
-            {HumanBodyBones.RightShoulder, JointId.ClavicleRight},
-            {HumanBodyBones.LeftUpperArm, JointId.ShoulderLeft},
-            {HumanBodyBones.RightUpperArm, JointId.ShoulderRight},
-            {HumanBodyBones.LeftLowerArm, JointId.ElbowLeft},
-            {HumanBodyBones.RightLowerArm, JointId.ElbowRight},
-            {HumanBodyBones.LeftHand, JointId.HandLeft},
-            {HumanBodyBones.RightHand, JointId.HandRight},
-            {HumanBodyBones.LeftToes, JointId.FootLeft},
-            {HumanBodyBones.RightToes, JointId.FootRight},
-            // {HumanBodyBones.LeftEye, JointId.EyeLeft},
-            // {HumanBodyBones.RightEye, JointId.EyeRight},
-            // {HumanBodyBones.Jaw, JointId.Nose},
-            // {HumanBodyBones.LeftThumbProximal, JointId.Count},
-            // {HumanBodyBones.LeftThumbIntermediate, JointId.Count},
-            // {HumanBodyBones.LeftThumbDistal, JointId.Count},
-            // {HumanBodyBones.LeftIndexProximal, JointId.Count},
-            // {HumanBodyBones.LeftIndexIntermediate, JointId.Count},
-            // {HumanBodyBones.LeftIndexDistal, JointId.Count},
-            // {HumanBodyBones.LeftMiddleProximal, JointId.Count},
-            // {HumanBodyBones.LeftMiddleIntermediate, JointId.Count},
-            // {HumanBodyBones.LeftMiddleDistal, JointId.Count},
-            // {HumanBodyBones.LeftRingProximal, JointId.Count},
-            // {HumanBodyBones.LeftRingIntermediate, JointId.Count},
-            // {HumanBodyBones.LeftRingDistal, JointId.Count},
-            // {HumanBodyBones.LeftLittleProximal, JointId.Count},
-            // {HumanBodyBones.LeftLittleIntermediate, JointId.Count},
-            // {HumanBodyBones.LeftLittleDistal, JointId.Count},
-            // {HumanBodyBones.RightThumbProximal, JointId.Count},
-            // {HumanBodyBones.RightThumbIntermediate, JointId.Count},
-            // {HumanBodyBones.RightThumbDistal, JointId.Count},
-            // {HumanBodyBones.RightIndexProximal, JointId.Count},
-            // {HumanBodyBones.RightIndexIntermediate, JointId.Count},
-            // {HumanBodyBones.RightIndexDistal, JointId.Count},
-            // {HumanBodyBones.RightMiddleProximal, JointId.Count},
-            // {HumanBodyBones.RightMiddleIntermediate, JointId.Count},
-            // {HumanBodyBones.RightMiddleDistal, JointId.Count},
-            // {HumanBodyBones.RightRingProximal, JointId.Count},
-            // {HumanBodyBones.RightRingIntermediate, JointId.Count},
-            // {HumanBodyBones.RightRingDistal, JointId.Count},
-            // {HumanBodyBones.RightLittleProximal, JointId.Count},
-            // {HumanBodyBones.RightLittleIntermediate, JointId.Count},
-            // {HumanBodyBones.RightLittleDistal, JointId.Count},
-        };
+            foreach (var bone in leftHandBoneMap)
+            {
+                try
+                {
+                    var nextRotZ = trackerHandlerMono.GetRelativeJointRotation(bone.Value).eulerAngles.z;
+                    var nextRotVec = new Vector3(0, 0, nextRotZ < 0 ? 0 : nextRotZ > 70 ? 70 : nextRotZ);
+                    var nextRot = Quaternion.Euler(nextRotVec);
+                    animator.GetBoneTransform(bone.Key).localRotation = new Quaternion(nextRot.x, nextRot.y, nextRot.z, nextRot.w);
+                }
+                catch (Exception exception)
+                {
+                    // ignored
+                }
+            }
+            
+            foreach (var bone in rightHandBoneMap)
+            {
+                try
+                {
+                    var nextRotZ = trackerHandlerMono.GetRelativeJointRotation(bone.Value).eulerAngles.z;
+                    var nextRotVec = new Vector3(0, 0, nextRotZ > 0 ? 0 : nextRotZ < -70 ? -70 : nextRotZ);
+                    var nextRot = Quaternion.Euler(nextRotVec);
+                    animator.GetBoneTransform(bone.Key).localRotation = new Quaternion(nextRot.x, nextRot.y, nextRot.z, nextRot.w);
+                }
+                catch (Exception exception)
+                {
+                    // ignored
+                }
+            }
+            
+            foreach (var bone in leftThumbBoneMap)
+            {
+                try
+                {
+                    var nextRotX = trackerHandlerMono.GetRelativeJointRotation(bone.Value).eulerAngles.x;
+                    var nextRotVec = new Vector3(nextRotX < 0 ? 0 : nextRotX > 70 ? 70 : nextRotX, 0, 0);
+                    var nextRot = Quaternion.Euler(nextRotVec);
+                    animator.GetBoneTransform(bone.Key).localRotation = new Quaternion(nextRot.x, nextRot.y, nextRot.z, nextRot.w);
+                }
+                catch (Exception exception)
+                {
+                    // ignored
+                }
+            }
+        }
+
+        private void debug()
+        {
+            boneRot = animator.GetBoneTransform(bone).localRotation.eulerAngles;
+            var a = trackerHandlerMono.GetRelativeJointRotation(joinId).eulerAngles;
+            joinIdRot = new Vector3(
+                a.x < 180 ? a.x : a.x - 360, 
+                a.y < 180 ? a.y : a.y - 360,
+                a.z < 180 ? a.z : a.z - 360);
+
+            cube.transform.localPosition = animator.GetBoneTransform(bone).position;
+            cube.transform.localRotation = animator.GetBoneTransform(bone).rotation;
+        }
+
+        /* Upper Body */
+        private readonly Dictionary<HumanBodyBones, JointId> upperBodyBoneMap =
+            new Dictionary<HumanBodyBones, JointId>
+            {
+                {HumanBodyBones.Head, JointId.Head},
+                {HumanBodyBones.Neck, JointId.Neck},
+                {HumanBodyBones.Chest, JointId.SpineChest},
+                {HumanBodyBones.Spine, JointId.SpineNavel},
+                {HumanBodyBones.LeftShoulder, JointId.ClavicleLeft},
+                {HumanBodyBones.RightShoulder, JointId.ClavicleRight},
+                {HumanBodyBones.LeftUpperArm, JointId.ShoulderLeft},
+                {HumanBodyBones.RightUpperArm, JointId.ShoulderRight},
+                {HumanBodyBones.LeftLowerArm, JointId.ElbowLeft},
+                {HumanBodyBones.RightLowerArm, JointId.ElbowRight},
+                {HumanBodyBones.LeftHand, JointId.WristLeft},
+                {HumanBodyBones.RightHand, JointId.WristRight},
+            };
+
+        /* Lower Body */
+        private readonly Dictionary<HumanBodyBones, JointId> lowerBodyBoneMap =
+            new Dictionary<HumanBodyBones, JointId>
+            {
+                {HumanBodyBones.Hips, JointId.SpineNavel},
+                {HumanBodyBones.LeftUpperLeg, JointId.HipLeft},
+                {HumanBodyBones.RightUpperLeg, JointId.HipRight},
+                {HumanBodyBones.LeftLowerLeg, JointId.KneeLeft},
+                {HumanBodyBones.RightLowerLeg, JointId.KneeRight},
+                {HumanBodyBones.LeftFoot, JointId.FootLeft},
+                {HumanBodyBones.RightFoot, JointId.FootRight},
+                {HumanBodyBones.LeftToes, JointId.FootLeft},
+                {HumanBodyBones.RightToes, JointId.FootRight},
+            };
+
+        private readonly Dictionary<HumanBodyBones, JointId> leftHandBoneMap =
+            new Dictionary<HumanBodyBones, JointId>()
+            {
+                {HumanBodyBones.LeftIndexProximal, JointId.HandLeft},
+                {HumanBodyBones.LeftIndexIntermediate, JointId.HandLeft},
+                {HumanBodyBones.LeftIndexDistal, JointId.HandLeft},
+                {HumanBodyBones.LeftMiddleProximal, JointId.HandLeft},
+                {HumanBodyBones.LeftMiddleIntermediate, JointId.HandLeft},
+                {HumanBodyBones.LeftMiddleDistal, JointId.HandLeft},
+                {HumanBodyBones.LeftRingProximal, JointId.HandLeft},
+                {HumanBodyBones.LeftRingIntermediate, JointId.HandLeft},
+                {HumanBodyBones.LeftRingDistal, JointId.HandLeft},
+                {HumanBodyBones.LeftLittleProximal, JointId.HandLeft},
+                {HumanBodyBones.LeftLittleIntermediate, JointId.HandLeft},
+                {HumanBodyBones.LeftLittleDistal, JointId.HandLeft},
+            };
+
+        private readonly Dictionary<HumanBodyBones, JointId> rightHandBoneMap =
+            new Dictionary<HumanBodyBones, JointId>()
+            {
+                {HumanBodyBones.RightIndexProximal, JointId.HandRight},
+                {HumanBodyBones.RightIndexIntermediate, JointId.HandRight},
+                {HumanBodyBones.RightIndexDistal, JointId.HandRight},
+                {HumanBodyBones.RightMiddleProximal, JointId.HandRight},
+                {HumanBodyBones.RightMiddleIntermediate, JointId.HandRight},
+                {HumanBodyBones.RightMiddleDistal, JointId.HandRight},
+                {HumanBodyBones.RightRingProximal, JointId.HandRight},
+                {HumanBodyBones.RightRingIntermediate, JointId.HandRight},
+                {HumanBodyBones.RightRingDistal, JointId.HandRight},
+                {HumanBodyBones.RightLittleProximal, JointId.HandRight},
+                {HumanBodyBones.RightLittleIntermediate, JointId.HandRight},
+                {HumanBodyBones.RightLittleDistal, JointId.HandRight},
+            };
+        
+        private readonly Dictionary<HumanBodyBones, JointId> leftThumbBoneMap =
+            new Dictionary<HumanBodyBones, JointId>()
+            {
+                {HumanBodyBones.LeftThumbProximal, JointId.ThumbLeft},
+                {HumanBodyBones.LeftThumbIntermediate, JointId.ThumbLeft},
+                {HumanBodyBones.LeftThumbDistal, JointId.ThumbLeft},
+            };
+        
+        private readonly Dictionary<HumanBodyBones, JointId> rightThumbBoneMap =
+            new Dictionary<HumanBodyBones, JointId>()
+            {
+                {HumanBodyBones.RightThumbProximal, JointId.ThumbRight},
+                {HumanBodyBones.RightThumbIntermediate, JointId.ThumbRight},
+                {HumanBodyBones.RightThumbDistal, JointId.ThumbRight},
+            };
+
+        /* NOT ASSIGN */
+        // {HumanBodyBones.UpperChest, JointId.SpineChest},
+        // {HumanBodyBones.LeftEye, JointId.EyeLeft},
+        // {HumanBodyBones.RightEye, JointId.EyeRight},
+        // {HumanBodyBones.Jaw, JointId.Nose},
     }
 }
