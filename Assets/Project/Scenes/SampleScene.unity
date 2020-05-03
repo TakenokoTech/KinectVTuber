@@ -341,7 +341,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &166578085
 Transform:
   m_ObjectHideFlags: 0
@@ -1036,7 +1036,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &620259076
 Transform:
   m_ObjectHideFlags: 0
@@ -1142,7 +1142,6 @@ MonoBehaviour:
   animator: {fileID: 1116055697}
   pelvis: {fileID: 45016111}
   debugFlag: 1
-  cube: {fileID: 1288369836}
   bone: 43
   boneRot: {x: 0, y: 0, z: 0}
   joinId: 15

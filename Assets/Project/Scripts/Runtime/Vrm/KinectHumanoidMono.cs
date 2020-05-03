@@ -17,7 +17,7 @@ namespace Project.Scripts.Runtime.Vrm
         [SerializeField] private GameObject pelvis;
         [SerializeField] private Boolean debugFlag;
 
-        [Space(16)] [SerializeField] private GameObject cube;
+        [Space(16)]
         [SerializeField] private HumanBodyBones bone;
         [SerializeField] private Vector3 boneRot;
         [SerializeField] private JointId joinId;
@@ -34,7 +34,7 @@ namespace Project.Scripts.Runtime.Vrm
 
         void Update()
         {
-            // MoveBody();
+            MoveBody();
             MoveFinger();
             if(debugFlag) debug();
         }
@@ -88,7 +88,7 @@ namespace Project.Scripts.Runtime.Vrm
                 try
                 {
                     var nextRotZ = trackerHandlerMono.GetRelativeJointRotation(bone.Value).eulerAngles.z;
-                    var nextRotVec = new Vector3(0, 0, nextRotZ > 0 ? 0 : nextRotZ < -70 ? -70 : nextRotZ);
+                    var nextRotVec = new Vector3(0, 0, nextRotZ > 360 ? 360 : nextRotZ < 290 ? 290 : nextRotZ);
                     var nextRot = Quaternion.Euler(nextRotVec);
                     animator.GetBoneTransform(bone.Key).localRotation = new Quaternion(nextRot.x, nextRot.y, nextRot.z, nextRot.w);
                 }
@@ -112,6 +112,21 @@ namespace Project.Scripts.Runtime.Vrm
                     // ignored
                 }
             }
+            
+            foreach (var bone in rightThumbBoneMap)
+            {
+                try
+                {
+                    var nextRotX = trackerHandlerMono.GetRelativeJointRotation(bone.Value).eulerAngles.x;
+                    var nextRotVec = new Vector3(nextRotX > 360 ? -360 : nextRotX < 290 ? -290 : -nextRotX, 0, 0);
+                    var nextRot = Quaternion.Euler(nextRotVec);
+                    animator.GetBoneTransform(bone.Key).localRotation = new Quaternion(nextRot.x, nextRot.y, nextRot.z, nextRot.w);
+                }
+                catch (Exception exception)
+                {
+                    // ignored
+                }
+            }
         }
 
         private void debug()
@@ -122,9 +137,6 @@ namespace Project.Scripts.Runtime.Vrm
                 a.x < 180 ? a.x : a.x - 360, 
                 a.y < 180 ? a.y : a.y - 360,
                 a.z < 180 ? a.z : a.z - 360);
-
-            cube.transform.localPosition = animator.GetBoneTransform(bone).position;
-            cube.transform.localRotation = animator.GetBoneTransform(bone).rotation;
         }
 
         /* Upper Body */
