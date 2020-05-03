@@ -18,15 +18,10 @@ namespace Project.Scripts.Runtime.Vrm
         [SerializeField] private Boolean debugFlag;
 
         [Space(16)]
-        [SerializeField] private HumanBodyBones bone;
+        [SerializeField] private HumanBodyBones humanBodyBones;
         [SerializeField] private Vector3 boneRot;
         [SerializeField] private JointId joinId;
         [SerializeField] private Vector3 joinIdRot;
-
-        [Space(16)] [SerializeField] private Vector3 debugVec1;
-        [SerializeField] private Vector3 debugVec2;
-        [SerializeField] private Vector3 debugVec3;
-        [SerializeField] private Vector3 debugVec4;
 
         void Start()
         {
@@ -35,111 +30,64 @@ namespace Project.Scripts.Runtime.Vrm
         void Update()
         {
             MoveBody();
-            MoveFinger();
-            if(debugFlag) debug();
-        }
 
-        void LateUpdate()
-        {
+            if (!debugFlag) return;
+            boneRot = animator.GetBoneTransform(humanBodyBones).localRotation.eulerAngles;
+            joinIdRot = trackerHandlerMono.GetRelativeJointRotation(joinId).eulerAngles;
         }
-
+        
         private void MoveBody()
         {
-            var concat = new Dictionary<HumanBodyBones, JointId>().Concat(upperBodyBoneMap).Concat(lowerBodyBoneMap);
-            foreach (var bone in concat)
-            {
-                try
-                {
-                    var nextRot = trackerHandlerMono.GetRelativeJointRotation(bone.Value);
-                    var prevRot = animator.GetBoneTransform(bone.Key).localRotation;
-                    animator.GetBoneTransform(bone.Key).localRotation =
-                        new Quaternion(nextRot.x, nextRot.y, nextRot.z, nextRot.w);
-                }
-                catch (Exception exception)
-                {
-                    // Log.D(Tag, $"{bone}: {exception.Message}");
-                }
-            }
-
             transform.localPosition = pelvis.transform.localPosition;
             transform.localRotation = pelvis.transform.localRotation;
-        }
 
-
-        private void MoveFinger()
-        {
-            foreach (var bone in leftHandBoneMap)
+            upperBodyBoneMap.TryForeach(bone =>
             {
-                try
-                {
-                    var nextRotZ = trackerHandlerMono.GetRelativeJointRotation(bone.Value).eulerAngles.z;
-                    var nextRotVec = new Vector3(0, 0, nextRotZ < 0 ? 0 : nextRotZ > 70 ? 70 : nextRotZ);
-                    var nextRot = Quaternion.Euler(nextRotVec);
-                    animator.GetBoneTransform(bone.Key).localRotation = new Quaternion(nextRot.x, nextRot.y, nextRot.z, nextRot.w);
-                }
-                catch (Exception exception)
-                {
-                    // ignored
-                }
-            }
+                var nextRot = trackerHandlerMono.GetRelativeJointRotation(bone.Value);
+                var prevRot = animator.GetBoneTransform(bone.Key).localRotation;
+                animator.GetBoneTransform(bone.Key).localRotation = new Quaternion(nextRot.x, nextRot.y, nextRot.z, nextRot.w);
+            });
             
-            foreach (var bone in rightHandBoneMap)
+            lowerBodyBoneMap.TryForeach(bone =>
             {
-                try
-                {
-                    var nextRotZ = trackerHandlerMono.GetRelativeJointRotation(bone.Value).eulerAngles.z;
-                    var nextRotVec = new Vector3(0, 0, nextRotZ > 360 ? 360 : nextRotZ < 290 ? 290 : nextRotZ);
-                    var nextRot = Quaternion.Euler(nextRotVec);
-                    animator.GetBoneTransform(bone.Key).localRotation = new Quaternion(nextRot.x, nextRot.y, nextRot.z, nextRot.w);
-                }
-                catch (Exception exception)
-                {
-                    // ignored
-                }
-            }
+                var nextRot = trackerHandlerMono.GetRelativeJointRotation(bone.Value);
+                var prevRot = animator.GetBoneTransform(bone.Key).localRotation;
+                animator.GetBoneTransform(bone.Key).localRotation = new Quaternion(nextRot.x, nextRot.y, nextRot.z, nextRot.w);
+            });
             
-            foreach (var bone in leftThumbBoneMap)
+            leftHandBoneMap.TryForeach(bone =>
             {
-                try
-                {
-                    var nextRotX = trackerHandlerMono.GetRelativeJointRotation(bone.Value).eulerAngles.x;
-                    var nextRotVec = new Vector3(nextRotX < 0 ? 0 : nextRotX > 70 ? 70 : nextRotX, 0, 0);
-                    var nextRot = Quaternion.Euler(nextRotVec);
-                    animator.GetBoneTransform(bone.Key).localRotation = new Quaternion(nextRot.x, nextRot.y, nextRot.z, nextRot.w);
-                }
-                catch (Exception exception)
-                {
-                    // ignored
-                }
-            }
+                var nextRotZ = trackerHandlerMono.GetRelativeJointRotation(bone.Value).eulerAngles.z;
+                var nextRotVec = new Vector3(0, 0, nextRotZ < 0 ? 0 : nextRotZ > 70 ? 70 : nextRotZ);
+                var nextRot = Quaternion.Euler(nextRotVec);
+                animator.GetBoneTransform(bone.Key).localRotation = new Quaternion(nextRot.x, nextRot.y, nextRot.z, nextRot.w);
+            });
             
-            foreach (var bone in rightThumbBoneMap)
+            rightHandBoneMap.TryForeach(bone =>
             {
-                try
-                {
-                    var nextRotX = trackerHandlerMono.GetRelativeJointRotation(bone.Value).eulerAngles.x;
-                    var nextRotVec = new Vector3(nextRotX > 360 ? -360 : nextRotX < 290 ? -290 : -nextRotX, 0, 0);
-                    var nextRot = Quaternion.Euler(nextRotVec);
-                    animator.GetBoneTransform(bone.Key).localRotation = new Quaternion(nextRot.x, nextRot.y, nextRot.z, nextRot.w);
-                }
-                catch (Exception exception)
-                {
-                    // ignored
-                }
-            }
+                var nextRotZ = trackerHandlerMono.GetRelativeJointRotation(bone.Value).eulerAngles.z;
+                var nextRotVec = new Vector3(0, 0, nextRotZ > 360 ? 360 : nextRotZ < 290 ? 290 : nextRotZ);
+                var nextRot = Quaternion.Euler(nextRotVec);
+                animator.GetBoneTransform(bone.Key).localRotation = new Quaternion(nextRot.x, nextRot.y, nextRot.z, nextRot.w);
+            });
+            
+            leftThumbBoneMap.TryForeach(bone =>
+            {
+                var nextRotX = trackerHandlerMono.GetRelativeJointRotation(bone.Value).eulerAngles.x;
+                var nextRotVec = new Vector3(nextRotX < 0 ? 0 : nextRotX > 70 ? 70 : nextRotX, 0, 0);
+                var nextRot = Quaternion.Euler(nextRotVec);
+                animator.GetBoneTransform(bone.Key).localRotation = new Quaternion(nextRot.x, nextRot.y, nextRot.z, nextRot.w);
+            });
+            
+            rightThumbBoneMap.TryForeach(bone =>
+            {
+                var nextRotX = trackerHandlerMono.GetRelativeJointRotation(bone.Value).eulerAngles.x;
+                var nextRotVec = new Vector3(nextRotX > 360 ? -360 : nextRotX < 290 ? -290 : -nextRotX, 0, 0);
+                var nextRot = Quaternion.Euler(nextRotVec);
+                animator.GetBoneTransform(bone.Key).localRotation = new Quaternion(nextRot.x, nextRot.y, nextRot.z, nextRot.w);
+            });
         }
-
-        private void debug()
-        {
-            boneRot = animator.GetBoneTransform(bone).localRotation.eulerAngles;
-            var a = trackerHandlerMono.GetRelativeJointRotation(joinId).eulerAngles;
-            joinIdRot = new Vector3(
-                a.x < 180 ? a.x : a.x - 360, 
-                a.y < 180 ? a.y : a.y - 360,
-                a.z < 180 ? a.z : a.z - 360);
-        }
-
-        /* Upper Body */
+        
         private readonly Dictionary<HumanBodyBones, JointId> upperBodyBoneMap =
             new Dictionary<HumanBodyBones, JointId>
             {
@@ -156,8 +104,7 @@ namespace Project.Scripts.Runtime.Vrm
                 {HumanBodyBones.LeftHand, JointId.WristLeft},
                 {HumanBodyBones.RightHand, JointId.WristRight},
             };
-
-        /* Lower Body */
+        
         private readonly Dictionary<HumanBodyBones, JointId> lowerBodyBoneMap =
             new Dictionary<HumanBodyBones, JointId>
             {
