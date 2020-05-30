@@ -15,25 +15,21 @@ namespace Project.Scripts.Runtime.Vrm
         [SerializeField] private TrackerHandlerMono trackerHandlerMono;
         [SerializeField] private Animator animator;
         [SerializeField] private GameObject pelvis;
-        [SerializeField] private Boolean debugFlag;
-
-        [Space(16)]
-        [SerializeField] private HumanBodyBones humanBodyBones;
-        [SerializeField] private Vector3 boneRot;
-        [SerializeField] private JointId joinId;
-        [SerializeField] private Vector3 joinIdRot;
-
-        void Start()
-        {
-        }
-
+        
+        // [Space(16)]
+        // [SerializeField] private Boolean debugFlag;
+        // [SerializeField] private HumanBodyBones humanBodyBones;
+        // [SerializeField] private Vector3 boneRot;
+        // [SerializeField] private JointId joinId;
+        // [SerializeField] private Vector3 joinIdRot;
+        
         void Update()
         {
             MoveBody();
 
-            if (!debugFlag) return;
-            boneRot = animator.GetBoneTransform(humanBodyBones).localRotation.eulerAngles;
-            joinIdRot = trackerHandlerMono.GetRelativeJointRotation(joinId).eulerAngles;
+            // if (!debugFlag) return;
+            // boneRot = animator.GetBoneTransform(humanBodyBones).localRotation.eulerAngles;
+            // joinIdRot = trackerHandlerMono.GetRelativeJointRotation(joinId).eulerAngles;
         }
         
         private void MoveBody()
@@ -124,7 +120,7 @@ namespace Project.Scripts.Runtime.Vrm
             };
 
         private readonly Dictionary<HumanBodyBones, JointId> leftHandBoneMap =
-            new Dictionary<HumanBodyBones, JointId>()
+            new Dictionary<HumanBodyBones, JointId>
             {
                 {HumanBodyBones.LeftIndexProximal, JointId.HandLeft},
                 {HumanBodyBones.LeftIndexIntermediate, JointId.HandLeft},
@@ -141,7 +137,7 @@ namespace Project.Scripts.Runtime.Vrm
             };
 
         private readonly Dictionary<HumanBodyBones, JointId> rightHandBoneMap =
-            new Dictionary<HumanBodyBones, JointId>()
+            new Dictionary<HumanBodyBones, JointId>
             {
                 {HumanBodyBones.RightIndexProximal, JointId.HandRight},
                 {HumanBodyBones.RightIndexIntermediate, JointId.HandRight},
@@ -158,7 +154,7 @@ namespace Project.Scripts.Runtime.Vrm
             };
         
         private readonly Dictionary<HumanBodyBones, JointId> leftThumbBoneMap =
-            new Dictionary<HumanBodyBones, JointId>()
+            new Dictionary<HumanBodyBones, JointId>
             {
                 {HumanBodyBones.LeftThumbProximal, JointId.ThumbLeft},
                 {HumanBodyBones.LeftThumbIntermediate, JointId.ThumbLeft},
@@ -166,7 +162,7 @@ namespace Project.Scripts.Runtime.Vrm
             };
         
         private readonly Dictionary<HumanBodyBones, JointId> rightThumbBoneMap =
-            new Dictionary<HumanBodyBones, JointId>()
+            new Dictionary<HumanBodyBones, JointId>
             {
                 {HumanBodyBones.RightThumbProximal, JointId.ThumbRight},
                 {HumanBodyBones.RightThumbIntermediate, JointId.ThumbRight},
