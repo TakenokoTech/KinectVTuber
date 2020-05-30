@@ -58,7 +58,8 @@ namespace Project.Scripts.Runtime.Vrm
             leftHandBoneMap.TryForeach(bone =>
             {
                 var nextRotZ = trackerHandlerMono.GetRelativeJointRotation(bone.Value).eulerAngles.z;
-                var nextRotVec = new Vector3(0, 0, nextRotZ < 0 ? 0 : nextRotZ > 70 ? 70 : nextRotZ);
+                var nextZ = nextRotZ <= 0 ? 0 : nextRotZ > 70 ? 70 : nextRotZ;
+                var nextRotVec = new Vector3(0, 0, nextZ);
                 var nextRot = Quaternion.Euler(nextRotVec);
                 animator.GetBoneTransform(bone.Key).localRotation = new Quaternion(nextRot.x, nextRot.y, nextRot.z, nextRot.w);
             });
@@ -66,7 +67,8 @@ namespace Project.Scripts.Runtime.Vrm
             rightHandBoneMap.TryForeach(bone =>
             {
                 var nextRotZ = trackerHandlerMono.GetRelativeJointRotation(bone.Value).eulerAngles.z;
-                var nextRotVec = new Vector3(0, 0, nextRotZ > 360 ? 360 : nextRotZ < 290 ? 290 : nextRotZ);
+                var nextZ = 0 >= nextRotZ ? 0 : nextRotZ >= 360 ? 360 : nextRotZ < 290 ? 290 : nextRotZ;
+                var nextRotVec = new Vector3(0, 0, nextZ);
                 var nextRot = Quaternion.Euler(nextRotVec);
                 animator.GetBoneTransform(bone.Key).localRotation = new Quaternion(nextRot.x, nextRot.y, nextRot.z, nextRot.w);
             });
@@ -74,7 +76,8 @@ namespace Project.Scripts.Runtime.Vrm
             leftThumbBoneMap.TryForeach(bone =>
             {
                 var nextRotX = trackerHandlerMono.GetRelativeJointRotation(bone.Value).eulerAngles.x;
-                var nextRotVec = new Vector3(nextRotX < 0 ? 0 : nextRotX > 70 ? 70 : nextRotX, 0, 0);
+                var nextX = nextRotX <= 0 ? 0 : nextRotX > 70 ? 70 : nextRotX;
+                var nextRotVec = new Vector3(nextX, 0, 0);
                 var nextRot = Quaternion.Euler(nextRotVec);
                 animator.GetBoneTransform(bone.Key).localRotation = new Quaternion(nextRot.x, nextRot.y, nextRot.z, nextRot.w);
             });
@@ -82,7 +85,8 @@ namespace Project.Scripts.Runtime.Vrm
             rightThumbBoneMap.TryForeach(bone =>
             {
                 var nextRotX = trackerHandlerMono.GetRelativeJointRotation(bone.Value).eulerAngles.x;
-                var nextRotVec = new Vector3(nextRotX > 360 ? -360 : nextRotX < 290 ? -290 : -nextRotX, 0, 0);
+                var nextX = 0 >= nextRotX ? 0 : nextRotX >= 360 ? -360 : nextRotX < 290 ? -290 : -nextRotX;
+                var nextRotVec = new Vector3(nextX, 0, 0);
                 var nextRot = Quaternion.Euler(nextRotVec);
                 animator.GetBoneTransform(bone.Key).localRotation = new Quaternion(nextRot.x, nextRot.y, nextRot.z, nextRot.w);
             });
